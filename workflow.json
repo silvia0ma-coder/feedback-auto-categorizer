@@ -1,116 +1,18 @@
 {
-  "name": "Sales Order",
+  "name": "Sales Order - Template",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "97a1c09d-d456-47ec-8901-8a91e7d1040e",
+        "path": "YOUR_UNIQUE_WEBHOOK_PATH",
         "options": {
-          "allowedOrigins": "*For texting: https://flowsync-feedback-hub.lovable.app"
+          "allowedOrigins": "*"
         }
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [
-        -1120,
-        -64
-      ],
-      "id": "e7ec457f-7831-433e-8619-0d6cb571fd7c",
-      "name": "Webhook",
-      "webhookId": "97a1c09d-d456-47ec-8901-8a91e7d1040e"
-    },
-    {
-      "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.category }}",
-                    "rightValue": "Product",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    },
-                    "id": "602d5da7-f4d5-4714-9a03-32488c1b4b43"
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Product"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "a55f5026-7b1d-466a-afdb-8d8401123156",
-                    "leftValue": "={{ $json.category }}",
-                    "rightValue": "Support",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals",
-                      "name": "filter.operator.equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Support"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "cc06b252-28c7-4d10-b530-c79bd1351c03",
-                    "leftValue": "={{ $json.category }}",
-                    "rightValue": "Billing",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals",
-                      "name": "filter.operator.equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Billing"
-            }
-          ]
-        },
-        "options": {
-          "fallbackOutput": "none"
-        }
-      },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.4,
-      "position": [
-        -672,
-        -80
-      ],
-      "id": "c535f028-4a1a-45e4-83c4-6937dd7960d6",
-      "name": "Switch"
+      "position": [-1120, -64],
+      "name": "Webhook"
     },
     {
       "parameters": {
@@ -118,268 +20,72 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        -896,
-        -64
-      ],
-      "id": "eff9d7c1-526c-4daa-a524-381056a964f7",
-      "name": "Code in JavaScript"
+      "position": [-896, -64],
+      "name": "Parse Body"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.category }}", "rightValue": "Product", "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Product" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.category }}", "rightValue": "Support", "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Support" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.category }}", "rightValue": "Billing", "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "Billing" }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [-672, -80],
+      "name": "Switch Category"
     },
     {
       "parameters": {
         "method": "POST",
-        "url":
+        "url": "YOUR_SLACK_OR_DISCORD_WEBHOOK_URL",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"text\": \"*New {{ $json.category }} Feedback*\\n*From:* {{ $json.name }} ({{ $json.email }})\\n*Message:* {{ $json.feedback }}\\n*Rating:* {{ $json.rating }} Stars\\n*Received:* {{ $json.timestamp }}\"\n}",
+        "jsonBody": "={ \"text\": \"*New {{ $json.category }} Feedback*\\n*From:* {{ $json.name }}\\n*Message:* {{ $json.feedback }}\" }",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
-      "position": [
-        -448,
-        -256
-      ],
-      "id": "dcc12ac9-2097-46c2-bab2-0415a82f6010",
-      "name": "feedback_product"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url":
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"text\": \"*🚨 New SUPPORT Feedback*\\n*From:* {{ $json.name }} ({{ $json.email }})\\n*Message:* {{ $json.feedback }}\\n*Rating:* {{ $json.rating }} Stars\\n*Received:* {{ $json.timestamp }}\"\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        -448,
-        -64
-      ],
-      "id": "fd93834e-e05b-4ea9-8b86-b7b6b8d66937",
-      "name": "feedback_support"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url":
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"text\": \"*💳 New BILLING Feedback*\\n*From:* {{ $json.name }} ({{ $json.email }})\\n*Message:* {{ $json.feedback }}\\n*Rating:* {{ $json.rating }} Stars\\n*Received:* {{ $json.timestamp }}\"\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        -448,
-        128
-      ],
-      "id": "1124ecfd-688c-49db-9cbf-04367d796001",
-      "name": "feedback_billing"
+      "position": [-448, -256],
+      "name": "Notification Node"
     },
     {
       "parameters": {
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "https://docs.google.com/spreadsheets/d/1C3RXYDS-1L9-f1P2h4ill8O73489b7Bw18E7VdLmUQA/edit?gid=0#gid=0",
-          "mode": "url"
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
         },
         "sheetName": {
           "__rl": true,
-          "value": "gid=0",
-          "mode": "list",
-          "cachedResultName": "Sheet1",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C3RXYDS-1L9-f1P2h4ill8O73489b7Bw18E7VdLmUQA/edit#gid=0"
+          "value": "Sheet1",
+          "mode": "list"
         },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "Name": "={{ $('Code in JavaScript').item.json.name }}",
-            "Email": "={{ $('Code in JavaScript').item.json.email }}",
-            "Category": "={{ $('Code in JavaScript').item.json.category }}",
-            "Timestamp": "={{ $('Code in JavaScript').item.json.timestamp }}",
-            "Feedback": "={{ $('Code in JavaScript').item.json.feedback }}",
-            "Rating": "={{ $('Code in JavaScript').item.json.rating }}"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "Timestamp",
-              "displayName": "Timestamp",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Name",
-              "displayName": "Name",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Email",
-              "displayName": "Email",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Category",
-              "displayName": "Category",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Feedback",
-              "displayName": "Feedback",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "Rating",
-              "displayName": "Rating",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "canBeUsedToMatch": true,
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
-        },
-        "options": {}
+            "Name": "={{ $('Parse Body').item.json.name }}",
+            "Email": "={{ $('Parse Body').item.json.email }}",
+            "Category": "={{ $('Parse Body').item.json.category }}",
+            "Feedback": "={{ $('Parse Body').item.json.feedback }}",
+            "Rating": "={{ $('Parse Body').item.json.rating }}"
+          }
+        }
       },
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
-      "position": [
-        -32,
-        -112
-      ],
-      "id": "37470eb3-d42f-41cd-901d-ee83a6960481",
-      "name": "Append row in sheet",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "Q2rGyTaM2Z9QuSR7",
-          "name": "Google Sheets account"
-        }
-      }
+      "position": [-32, -112],
+      "name": "Google Sheets"
     }
   ],
-  "pinData": {},
   "connections": {
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript": {
-      "main": [
-        [
-          {
-            "node": "Switch",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Switch": {
-      "main": [
-        [
-          {
-            "node": "feedback_product",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "feedback_support",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "feedback_billing",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "feedback_product": {
-      "main": [
-        [
-          {
-            "node": "Append row in sheet",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "feedback_support": {
-      "main": [
-        [
-          {
-            "node": "Append row in sheet",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "feedback_billing": {
-      "main": [
-        [
-          {
-            "node": "Append row in sheet",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
-  },
-  "active": false,
-  "settings": {
-    "executionOrder": "v1",
-    "binaryMode": "separate",
-    "timeSavedMode": "fixed",
-    "timezone": "Africa/Lagos",
-    "callerPolicy": "workflowsFromSameOwner",
-    "availableInMCP": false
-  },
-  "versionId": "54cc3660-8a9e-4297-ba92-38b67a563ae3",
-  "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "a4f49ec11bee91608a08d16d9e7b1ce7b98a0bab97eea5d8647261777bf73a3d"
-  },
-  "id": "Hs7w516MRBUkJaGX",
-  "tags": []
+    "Webhook": { "main": [[{ "node": "Parse Body", "type": "main", "index": 0 }]] },
+    "Parse Body": { "main": [[{ "node": "Switch Category", "type": "main", "index": 0 }]] },
+    "Switch Category": { "main": [[{ "node": "Notification Node", "type": "main", "index": 0 }], [{ "node": "Notification Node", "type": "main", "index": 0 }], [{ "node": "Notification Node", "type": "main", "index": 0 }]] },
+    "Notification Node": { "main": [[{ "node": "Google Sheets", "type": "main", "index": 0 }]] }
+  }
 }
